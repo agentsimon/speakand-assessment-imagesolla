@@ -1,0 +1,68 @@
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #f3f4f6;
+}
+
+.container {
+  max-width: 800px;
+}
+
+.assessment-output {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.6;
+  overflow-y: auto; /* Enable vertical scrolling */
+}
+
+#micLevelIndicator {
+  height: 16px; /* Taller */
+  background-color: #e5e7eb;
+  transition: width 0.1s ease-in-out;
+  /* New gradient for the active state */
+  background-image: linear-gradient(to right, #6ee7b7, #10b981);
+}
+
+.level-active {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); /* A glow effect */
+}
+
+#stopBtn {
+  display: none; /* Initially hidden */
+}
+
+#recordBtn,
+#pickImageBtn {
+  display: inline-block;
+}
+
+/* New styles for disabled buttons */
+#recordBtn:disabled,
+#pickImageBtn:disabled {
+  background-color: #d1d5db; /* A gray shade */
+  color: #6b7280; /* Darker gray text */
+  cursor: not-allowed;
+  box-shadow: none;
+  transition: none;
+}
+
+/* New flexbox layout for the top section */
+.top-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap; /* Allows wrapping on smaller screens */
+}
+
+.image-column {
+  flex-shrink: 0;
+}
+
+.controls-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.5rem; /* Gap between buttons and elements */
+  padding-top: 1rem;
+}
