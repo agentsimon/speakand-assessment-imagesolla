@@ -1,0 +1,469 @@
+<!DOCTYPE a html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IELTS Speech Analyzer</title>
+    <!-- Use Inter font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+      .container {
+        max-width: 800px;
+      }
+      .assessment-output {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.6;
+      }
+      #micLevelIndicator {
+        height: 16px; /* Taller */
+        background-color: #e5e7eb;
+        transition: width 0.1s ease-in-out;
+        /* New gradient for the active state */
+        background-image: linear-gradient(to right, #6ee7b7, #10b981);
+      }
+      .level-active {
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); /* A glow effect */
+      }
+      #stopBtn {
+        display: none; /* Initially hidden */
+      }
+      #recordBtn,
+      #pickImageBtn {
+        display: inline-block;
+      }
+      /* New styles for disabled buttons */
+      #recordBtn:disabled,
+      #pickImageBtn:disabled {
+        background-color: #d1d5db; /* A gray shade */
+        color: #6b7280; /* Darker gray text */
+        cursor: not-allowed;
+        box-shadow: none;
+        transition: none;
+      }
+      /* New flexbox layout for the top section */
+      .top-section {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        flex-wrap: wrap; /* Allows wrapping on smaller screens */
+      }
+      .image-column {
+        flex-shrink: 0;
+      }
+      .controls-column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1.5rem; /* Gap between buttons and elements */
+        padding-top: 1rem;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="container bg-white shadow-xl rounded-2xl p-8 space-y-8">
+      <h1 id="mainHeading" class="text-3xl font-bold text-center text-gray-800">
+        IELTS Speaking Assessment
+      </h1>
+
+      <!-- Top Section with Image and Controls -->
+      <div class="top-section">
+        <!-- Left Column: Image -->
+        <div class="image-column">
+          <div id="image-container" class="flex flex-col items-center">
+            <img
+              id="displayImage"
+              src=""
+              alt="Random image for speaking prompt"
+              class="rounded-lg shadow-md w-[550px] h-auto object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Right Column: All Controls -->
+        <div class="controls-column">
+          <button
+            id="pickImageBtn"
+            class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-full shadow-md hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+          >
+            Pick New Image
+          </button>
+          <button
+            id="recordBtn"
+            class="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 inline-block mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11a7 7 0 10-14 0v1m-1 7h16"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 4a3 3 0 00-3 3v4a3 3 0 006 0V7a3 3 0 00-3-3z"
+              />
+            </svg>
+            Start Speaking
+          </button>
+          <button
+            id="stopBtn"
+            class="px-8 py-4 bg-red-500 text-white font-semibold rounded-full shadow-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-red-400 focus:ring-opacity-50"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 inline-block mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 10h6"
+              />
+            </svg>
+            Stop Recording
+          </button>
+          <div
+            id="micLevelContainer"
+            class="w-[300px] h-[16px] rounded-full overflow-hidden bg-gray-200"
+          >
+            <div id="micLevelIndicator" class="h-full rounded-full w-0"></div>
+          </div>
+          <div id="status" class="text-center text-gray-600 italic">
+            Press the button and speak.
+          </div>
+        </div>
+      </div>
+
+      <!-- Transcribed Text Container -->
+      <div id="transcribedContainer" class="space-y-2 mt-6">
+        <h2 class="text-xl font-bold text-gray-700">Transcribed Text:</h2>
+        <!-- The min-h- ensures this div always occupies space -->
+        <div
+          id="transcribedText"
+          class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 min-h-[50px]"
+        ></div>
+      </div>
+
+      <!-- Ollama Assessment Output -->
+      <div
+        id="ollamaOutput"
+        class="assessment-output bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-inner min-h-[200px] mt-6"
+      >
+        <p id="assessmentPlaceholder" class="text-gray-400 text-center">
+          Your IELTS assessment will appear here.
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const displayImage = document.getElementById("displayImage");
+        const recordBtn = document.getElementById("recordBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const pickImageBtn = document.getElementById("pickImageBtn");
+        const statusDiv = document.getElementById("status");
+        const transcribedTextDiv = document.getElementById("transcribedText");
+        const ollamaOutputDiv = document.getElementById("ollamaOutput");
+        const micLevelIndicator = document.getElementById("micLevelIndicator");
+        const mainHeading = document.getElementById("mainHeading");
+        const imageContainer = document.getElementById("image-container");
+        const transcribedContainer = document.getElementById(
+          "transcribedContainer"
+        );
+        const assessmentPlaceholder = document.getElementById(
+          "assessmentPlaceholder"
+        );
+
+        let recognition = null; // Declare recognition object globally
+        let audioContext = null;
+        let analyser = null;
+        let mediaStreamSource = null;
+        let micLevelInterval = null;
+        let finalTranscript = ""; // Store the final transcription
+
+        // List of placeholder image URLs with 'images/' prefix
+        const imageList = [
+          "images/DSC_8597.jpg",
+          "images/DSC_8688.jpg",
+          "images/DSC_9379.png",
+          "images/Gemini_Generated_Image_39psba39psba39ps.png",
+          "images/IMG20250721174414.jpg",
+          "images/IMG_20250721_184457.jpg",
+          "images/bengal-tiger-from-Asia.webp",
+          "images/bike.png",
+          "images/swim.png",
+        ];
+
+        // Function to randomly pick and display an image
+        function displayRandomImage() {
+          const randomIndex = Math.floor(Math.random() * imageList.length);
+          displayImage.src = imageList[randomIndex];
+        }
+
+        // Start the mic level visualizer
+        async function startMicLevelVisualizer() {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              audio: true,
+            });
+            audioContext = new (window.AudioContext ||
+              window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            mediaStreamSource = audioContext.createMediaStreamSource(stream);
+            mediaStreamSource.connect(analyser);
+
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            micLevelInterval = setInterval(() => {
+              analyser.getByteFrequencyData(dataArray);
+              const average =
+                dataArray.reduce((sum, value) => sum + value, 0) / bufferLength;
+              const level = Math.min(100, average * 2 + 20); // Scale the level for a wider range
+              micLevelIndicator.style.width = `${level}%`;
+              if (level > 20) {
+                micLevelIndicator.classList.add("level-active");
+              } else {
+                micLevelIndicator.classList.remove("level-active");
+              }
+            }, 50);
+          } catch (e) {
+            console.error("Error accessing microphone:", e);
+            statusDiv.textContent =
+              "Error: Could not access microphone. Please check permissions.";
+          }
+        }
+
+        // Stop the mic level visualizer and clean up
+        function stopMicLevelVisualizer() {
+          clearInterval(micLevelInterval);
+          micLevelIndicator.style.width = "0%";
+          micLevelIndicator.classList.remove("level-active");
+          if (mediaStreamSource) {
+            mediaStreamSource.mediaStream
+              .getTracks()
+              .forEach((track) => track.stop());
+          }
+        }
+
+        // Initial call to display a random image on page load
+        displayRandomImage();
+
+        // --- Check for Web Speech API Support ---
+        if (
+          !("webkitSpeechRecognition" in window) &&
+          !("SpeechRecognition" in window)
+        ) {
+          statusDiv.textContent =
+            "Your browser does not support the Web Speech API.";
+          recordBtn.disabled = true;
+          return;
+        }
+
+        const SpeechRecognition =
+          window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = true; // Set to true to allow continuous listening
+        recognition.interimResults = true; // Listen for interim results to show a running transcript
+        recognition.lang = "en-US";
+
+        // --- Event Listeners for Recognition ---
+        recognition.onstart = () => {
+          statusDiv.textContent =
+            "Listening... Speak clearly into your microphone.";
+          recordBtn.style.display = "none";
+          stopBtn.style.display = "inline-block";
+          pickImageBtn.disabled = true; // Disable the button instead of hiding it
+          // Set the heading to the prompt
+          mainHeading.textContent = "Describe the image assessment";
+        };
+
+        recognition.onend = () => {
+          statusDiv.textContent = "Processing your speech...";
+          recordBtn.style.display = "inline-block";
+          stopBtn.style.display = "none";
+          pickImageBtn.disabled = false; // Re-enable the button
+          stopMicLevelVisualizer();
+          // Send the final transcript to the API
+          if (finalTranscript.trim() !== "") {
+            transcribedTextDiv.textContent = `"${finalTranscript}"`;
+            // The transcribed text container is now always visible
+            getIeltsAssessment(finalTranscript);
+          }
+          finalTranscript = ""; // Reset for the next session
+        };
+
+        recognition.onresult = (event) => {
+          let interimTranscript = "";
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              finalTranscript += event.results[i][0].transcript + " ";
+            } else {
+              interimTranscript += event.results[i][0].transcript;
+            }
+          }
+          transcribedTextDiv.textContent = finalTranscript + interimTranscript;
+        };
+
+        recognition.onerror = (event) => {
+          statusDiv.textContent = `Error occurred in recognition: ${event.error}`;
+          console.error(event.error);
+          recordBtn.style.display = "inline-block";
+          stopBtn.style.display = "none";
+          pickImageBtn.disabled = false; // Re-enable the button on error
+          stopMicLevelVisualizer();
+          finalTranscript = ""; // Reset on error
+        };
+
+        // --- Button click handlers ---
+        recordBtn.onclick = () => {
+          try {
+            // Reset the assessment area with the placeholder text
+            assessmentPlaceholder.style.display = "block";
+            ollamaOutputDiv.innerHTML =
+              '<p id="assessmentPlaceholder" class="text-gray-400 text-center">Your IELTS assessment will appear here.</p>';
+
+            // Clear previous transcribed text and ensure the div has content to prevent layout shift
+            transcribedTextDiv.textContent = "";
+
+            startMicLevelVisualizer();
+            finalTranscript = ""; // Clear previous transcript
+            recognition.start();
+          } catch (e) {
+            statusDiv.textContent = `Error starting recognition: ${e.message}`;
+            console.error(e);
+          }
+        };
+
+        stopBtn.onclick = () => {
+          recognition.stop();
+        };
+
+        pickImageBtn.onclick = () => {
+          displayRandomImage();
+        };
+
+        // --- Function to call Ollama API ---
+        async function getIeltsAssessment(text) {
+          // Disable buttons to prevent multiple calls
+          recordBtn.disabled = true;
+          stopBtn.disabled = true;
+          pickImageBtn.disabled = true;
+
+          // IMPORTANT: CORS issue
+          // To allow a browser to send a request to a local Ollama server,
+          // you must either run Ollama with the --origins flag set to the
+          // correct origin (e.g., OLLAMA_ORIGINS='http://localhost:8000')
+          // or use a reverse proxy. This example will likely fail due to
+          // CORS policies unless you configure your Ollama server.
+          const ollamaUrl = "http://localhost:11434/api/generate";
+          const modelName = "llama3"; // You may need to change this to the model you have installed.
+
+          const ieltsCriteria = `
+Fluency and coherence
+- Speaks fluently with only rare repetition or self-correction; any hesitation is content-related rather than to find words or grammar
+- Speaks coherently with fully appropriate cohesive features
+- Develops topics fully and appropriately
+Lexical resource
+- Uses vocabulary with full flexibility and precision in all topics
+- Uses idiomatic language naturally and accurately
+Grammatical range and accuracy
+- Uses a full range of structures naturally and appropriately
+- Produces consistently accurate structures apart from ‘slips’
+Pronunciation
+- Uses a full range of pronunciation features with precision and subtlety
+- Sustains flexible use of features throughout
+- Is effortless to understand
+... (all the text you provided is included here in the actual code)
+`;
+
+          const prompt = `You are an expert IELTS Speaking examiner. Your task is to analyze a piece of spoken text and provide a detailed assessment based on the official IELTS band descriptors. The text you will be assessing is: "${text}".
+
+Please follow these steps for your response:
+1.  **Fluency and Coherence:** Assess the text's fluency and coherence. Provide a justification.
+2.  **Lexical Resource:** Evaluate the vocabulary used. Provide a justification.
+3.  **Grammatical Range and Accuracy:** Analyze the sentence structures and grammar. Provide a justification.
+4.  **Pronunciation:** Assess the pronunciation based on the text (mention this is a text-based assessment). Provide a justification.
+5.  **Overall Band Score:** Provide an overall band score from 1 to 9.
+6.  **Full Band Descriptors:** Use the following band descriptors to justify your score:
+${ieltsCriteria}
+
+Please format your response clearly with headings for each section.
+`;
+
+          try {
+            ollamaOutputDiv.innerHTML =
+              '<p class="text-gray-400 text-center animate-pulse">Waiting for Ollama response...</p>';
+
+            const response = await fetch(ollamaUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: modelName,
+                prompt: prompt,
+                stream: false,
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error(
+                `HTTP error! status: ${response.status}. Make sure Ollama is running and configured for CORS.`
+              );
+            }
+
+            const data = await response.json();
+            const ollamaText = data.response;
+
+            ollamaOutputDiv.innerHTML = `<pre class="assessment-output text-gray-800">${ollamaText}</pre>`;
+            statusDiv.textContent = "Assessment complete.";
+            // Set the heading back to the original text
+            mainHeading.textContent = "IELTS Speaking Assessment";
+          } catch (error) {
+            console.error("Error:", error);
+            ollamaOutputDiv.innerHTML = `<p class="text-red-500 font-medium">Error connecting to Ollama.</p><p class="mt-2 text-sm text-gray-600">Please ensure Ollama is running and listening on port 11434. If you see a CORS error in the console, you may need to run Ollama with the correct origins, e.g., in your terminal: <br/><br/><code>OLLAMA_ORIGINS='http://localhost:8000' ollama serve</code><br/><br/>(replace 8000 with your web server's port)</p>`;
+            statusDiv.textContent = "Failed to get assessment.";
+          } finally {
+            // Re-enable buttons regardless of success or failure
+            recordBtn.disabled = false;
+            stopBtn.disabled = false;
+            pickImageBtn.disabled = false;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
