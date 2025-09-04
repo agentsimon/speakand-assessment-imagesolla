@@ -10,45 +10,30 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="container bg-white shadow-xl rounded-2xl p-8 space-y-8">
-      <h1 id="mainHeading" class="text-3xl font-bold text-center text-gray-800">
-        IELTS Speaking Assessment
-      </h1>
+  <body class="body-container">
+    <div class="container">
+      <h1 id="mainHeading" class="main-heading">IELTS Speaking Assessment</h1>
 
       <div class="top-section">
         <div class="image-column">
-          <div id="image-container" class="flex flex-col items-center">
+          <div id="image-container" class="image-container">
             <img
               id="displayImage"
               src=""
               alt="Random image for speaking prompt"
-              class="rounded-lg shadow-md w-[550px] h-auto object-cover"
+              class="display-image"
             />
           </div>
         </div>
 
         <div class="controls-column">
-          <button
-            id="pickImageBtn"
-            class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-full shadow-md hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
-          >
+          <button id="pickImageBtn" class="button secondary-button">
             Pick New Image
           </button>
-          <button
-            id="recordBtn"
-            class="px-8 py-4 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 inline-block mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+          <button id="recordBtn" class="button primary-button record-button">
+          
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -64,17 +49,8 @@
             </svg>
             Start Speaking
           </button>
-          <button
-            id="stopBtn"
-            class="px-8 py-4 bg-red-500 text-white font-semibold rounded-full shadow-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-red-400 focus:ring-opacity-50"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6 inline-block mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+          <button id="stopBtn" class="button stop-button">
+         
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -90,36 +66,25 @@
             </svg>
             Stop Recording
           </button>
-          <div
-            id="micLevelContainer"
-            class="w-[300px] h-[16px] rounded-full overflow-hidden bg-gray-200"
-          >
-            <div id="micLevelIndicator" class="h-full rounded-full w-0"></div>
+          <div id="micLevelContainer" class="mic-level-container">
+            <div id="micLevelIndicator" class="mic-level-indicator"></div>
           </div>
-          <div id="status" class="text-center text-gray-600 italic">
-            Press the button and speak.
-          </div>
+          <div id="status" class="status-text">Press the button and speak.</div>
         </div>
       </div>
 
-      <div id="transcribedContainer" class="space-y-2 mt-6">
-        <h2 class="text-xl font-bold text-gray-700">Transcribed Text:</h2>
-        <div
-          id="transcribedText"
-          class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 text-gray-700 min-h-[50px]"
-        ></div>
+      <div id="transcribedContainer" class="transcribed-container">
+        <h2 class="section-heading">Transcribed Text:</h2>
+        <div id="transcribedText" class="transcribed-text"></div>
       </div>
 
-      <div
-        id="ollamaOutput"
-        class="assessment-output bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-inner max-h-[300px] mt-6"
-      >
-        <p id="assessmentPlaceholder" class="text-gray-400 text-center">
+      <div id="ollamaOutput" class="ollama-output">
+        <p id="assessmentPlaceholder" class="assessment-placeholder">
           Your IELTS assessment will appear here.
         </p>
       </div>
     </div>
 
-    <script src="scripts/image_description.js"></script>
+    <script type="module" src="scripts/app.js"></script>
   </body>
 </html>
